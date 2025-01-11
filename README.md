@@ -3,27 +3,29 @@
   Implemented *Pythonic* way as well as *low level native External Merge Sort*
   
   **Problem Stement** </br>
-  All Sorting Algorithm works within the RAM .When the data to be  sorted does not fit into the RAM and      instead they   resides in the slower external memory (usually a hard drive) , this technique is used .
-Example , If we  have to Sort 100 numbers with each number 1KB and our RAM size is 10KB ,[external merge sort](https://en.wikipedia.org/wiki/External_sorting) works like a charm !.
+  All Sorting Algorithm works within the RAM. When the data to be sorted does not fit into the RAM
+  but in the slower external memory (usually a hard drive), this technique is used.
+  [external merge sort](https://en.wikipedia.org/wiki/External_sorting)
 
 **How to ?**
 
 > Split Phase
-* Split the 100 KB file into 10 files each 10kb
-* Sort the 10KB files using some efficient Sorting Algo in O(nlogn)
-* Stores each of the smaller files to disk .
+* Split the dataset into chunks each one smaller than the RAM
+* Sort the rows inside each chunk using some efficient Sorting Algo in O(n log(n))
+* Stores each of the sorted small chunks to disk.
 
 > Merge Phase
-* Do a [K-way merge](https://en.wikipedia.org/wiki/K-way_merge_algorithm)  with each smaller files one by one. Inline the details .
-* After the Split Phase , A list of file handler of all the splitted files will be stored - **sortedTempFileHandlerList**
-* Now, We creates a list of heapnode - **heapnodes**. Each heapnode will  stores the actual entry read from the file and also the file which owns it . The heapnodes is heapified and it will be a min-heap.
-* Assuming there 10 files , heapnodes will takes 10KB only (each number assume 1KB) .
-   - Loop While Least Element  (the top of heap ) is **INT_MAX**
-     * Picks the node with least element from heapnodes  . ( 0(1) since heapnodes is a min heap )
+* Do a [K-way merge](https://en.wikipedia.org/wiki/K-way_merge_algorithm) of the chunks.
+
+Inline the details.
+* After the Split Phase, A list of file handlers of all the chunks will be stored - **sortedTempFileHandlerList**
+* We create a list of heap-nodes - **heapnodes**. Each heap-node will store the actual entry read from each chunk and also the file which owns it. 
+   - Loop While Least Element (the top of heap ) is **INT_MAX**
+     * Picks the node with min element from heap-nodes.
      * Write the element to  **sortedLargeFile** (it will be the sorted number)
-     * Find the *filehandler* of the corresponding element by looking at heapnode.filehandler .
-     *  Read the next item from the file . If it's **EOF**, mark the  item as **INT_MAX**  
-     *  Put the item to heap top . Again Heapify to persist min heap property .
-     *  *Continue ;*
+     * Find the *filehandler* of the corresponding element by looking at heapnode.filehandler.
+     * Read the next item from the file. If it's **EOF**, mark the item as **INT_MAX**  
+     * Put the item at the heap-top.
+     * Heapify to persist min-heap property.
       
-* At the end of the Merge Phase **sortedLargeFile** will have all the elements in sorted  order .  
+* At the end of the Merge Phase **sortedLargeFile** will have all the elements in sorted order.
